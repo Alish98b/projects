@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"groupie-tracker/data"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	data.Responce()
 }
