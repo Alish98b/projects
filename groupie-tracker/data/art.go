@@ -18,13 +18,22 @@ type Artists struct {
 	Relations    string   `json:"relations"`
 }
 
-const ArtistURL string = "https://groupietrackers.herokuapp.com/api/artists"
+type LocationsData struct {
+	ID        int      `json:"id"`
+	Locations []string `json:"locations"`
+	Dates     string   `json:"dates"`
+}
+
+const (
+	ArtistUrl    string = "https://groupietrackers.herokuapp.com/api/artists"
+	LocationsUrl string = "https://groupietrackers.herokuapp.com/api/locations"
+)
 
 func Responce() ([]Artists, error) {
 	var artists []Artists
-	zapros, err := http.Get(ArtistURL)
+	zapros, err := http.Get(ArtistUrl)
 	if err != nil {
-		fmt.Println("Ne schital json")
+		fmt.Println("Ne schital json", err)
 		return nil, err
 	}
 	defer zapros.Body.Close()
@@ -36,8 +45,29 @@ func Responce() ([]Artists, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	for _, ch := range artists {
-		fmt.Println(ch.Name)
-	}
+	// for _, ch := range artists {
+	// 	fmt.Println(ch.Relations)
+	// }
 	return artists, nil
+}
+
+func ResponceRelations() ([]LocationsData, error) {
+	var locations []LocationsData
+	res, err := http.Get(LocationsUrl)
+	if err != nil {
+		fmt.Println("Ошибка считывания Json")
+		return nil, err
+	}
+	defer res.Body.Close()
+	decoder := json.NewDecoder(res.Body)
+
+	err = decoder.Decode(&locations)
+	if err != nil {
+		fmt.Println("Ошибка декордирование", err)
+		return nil, err
+	}
+	for _, ch := range locations {
+		fmt.Println(ch.ID)
+	}
+	return locations, nil
 }
