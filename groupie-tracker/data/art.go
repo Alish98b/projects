@@ -19,6 +19,8 @@ type Artists struct {
 	LocationsData
 }
 
+var AllArtist []Artists
+
 type LocationsData struct {
 	ID             int                 `json:"id"`
 	DatesLocations map[string][]string `json:"datesLocations"`
@@ -59,6 +61,8 @@ func Responce() ([]Artists, error) {
 	// 	fmt.Println(ch.Name)
 	// }
 	//	fmt.Println(artists)
+
+	AllArtist = artists
 	return artists, nil
 }
 

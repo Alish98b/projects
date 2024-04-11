@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Info</title>
+</head>
+<body>
+    <h1>{{.Name}}</h1>
+    <p>ID: {{.Id}}</p>
+    <p>Image: <img src="{{.Image}}" alt="{{.Name}}"></p>
+    <p>Members:</p>
+    <ul>
+        {{range .Members}}
+        <li>{{.}}</li>
+        {{end}}
+    </ul>
+    <p>Creation Date: {{.CreationDate}}</p>
+    <p>First Album: {{.FirstAlbum}}</p>
+    <p>Locations: {{.Locations}}</p>
+    <p>Concert Dates: {{.ConcertDates}}</p>
+</body>
+</html>
