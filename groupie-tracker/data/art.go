@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type Artists struct {
@@ -15,18 +16,17 @@ type Artists struct {
 	FirstAlbum   string   `json:"firstAlbum"`
 	Locations    string   `json:"locations"`
 	ConcertDates string   `json:"concertDates"`
-	Relations    string   `json:"relations"`
+	LocationsData
 }
 
 type LocationsData struct {
-	ID        int      `json:"id"`
-	Locations []string `json:"locations"`
-	Dates     string   `json:"dates"`
+	ID             int                 `json:"id"`
+	DatesLocations map[string][]string `json:"datesLocations"`
 }
 
 const (
 	ArtistUrl    string = "https://groupietrackers.herokuapp.com/api/artists"
-	LocationsUrl string = "https://groupietrackers.herokuapp.com/api/locations"
+	RelationsUrl string = "https://groupietrackers.herokuapp.com/api/relation/"
 )
 
 func Responce() ([]Artists, error) {
@@ -38,36 +38,48 @@ func Responce() ([]Artists, error) {
 	}
 	defer zapros.Body.Close()
 
-	decoder := json.NewDecoder(zapros.Body)
+	if zapros.StatusCode != http.StatusOK {
+		return nil, err
+	}
 
-	err = decoder.Decode(&artists)
+	err = json.NewDecoder(zapros.Body).Decode(&artists)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
+
+	for _, v := range artists {
+		v.LocationsData, err = ResponceRelations(v.Id)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// for _, ch := range artists {
-	// 	fmt.Println(ch.Relations)
+	// 	fmt.Println(ch.Name)
 	// }
+	//	fmt.Println(artists)
 	return artists, nil
 }
 
-func ResponceRelations() ([]LocationsData, error) {
-	var locations []LocationsData
-	res, err := http.Get(LocationsUrl)
+func ResponceRelations(id int) (LocationsData, error) {
+	abob := strconv.Itoa(id)
+	var relation LocationsData
+	res, err := http.Get(RelationsUrl + abob)
 	if err != nil {
 		fmt.Println("Ошибка считывания Json")
-		return nil, err
+		return relation, err
 	}
 	defer res.Body.Close()
 	decoder := json.NewDecoder(res.Body)
 
-	err = decoder.Decode(&locations)
+	err = decoder.Decode(&relation)
 	if err != nil {
 		fmt.Println("Ошибка декордирование", err)
-		return nil, err
+		return relation, err
 	}
-	for _, ch := range locations {
-		fmt.Println(ch.ID)
-	}
-	return locations, nil
+	// for _, ch := range relation {
+	// 	fmt.Println(ch.ID)
+	// }
+	return relation, nil
 }
